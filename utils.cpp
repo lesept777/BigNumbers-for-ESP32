@@ -8,19 +8,23 @@ char     oper;
 void help() {
   Serial.println("-------------------------------------------------------------------");
   Serial.println("User's manual:");
-  Serial.println("Enter numbers separated by 'e' or 'E' and end with one or several !");
+  Serial.println("A big number is a set of numbers separated by 'e' or 'E'");
   Serial.println("As in engineering format, the 'e' stands for 10^");
-  Serial.println("Several e following stand for 10^10^... 10^");
+  Serial.println("Several consecutive 'e' stand for 10^10^... 10^");
+  Serial.println("Enter 2 big numbers and operators (+ * ^) or comparators (< > =");
   Serial.println("Use ! for the factorial. !! is the factorial of the factorial, etc.");
   Serial.println("Some examples:");
-  Serial.println("12.345e67!   : factorial of 12.345 10^(67)");
-  Serial.println("12e3.4e56 !! : factorial of factorial of 12 10^(3.4 10^56)");
-  Serial.println("1eee23 !     : factorial of 10^10^10^23");
+  Serial.println("12.345e67!    : factorial of 12.345 10^(67)");
+  Serial.println("12e3.4e56 !!  : factorial of factorial of 12 10^(3.4 10^56)");
+  Serial.println("3eee23 !      : factorial of 3.10^10^10^23");
+  Serial.println("2e3e4 + 3e5e7 : add the 2 big numbers");
+  Serial.println("2e3e4 * 3e5e7 : multiply the 2 big numbers");
+  Serial.println("2e3e4 ^ 3e5e7 : compute the power of the 2 big numbers (also p or P");
+  Serial.println("2e3e4 < 3e5e7 : compare the 2 big numbers");
   Serial.println("-------------------------------------------------------------------");
 }
 
 // read and store keyboard input
-#define MAXINPUT 60
 char* readSerial () {
   static char input[MAXINPUT];
   uint8_t index = 0;
@@ -56,6 +60,7 @@ bool parseOperator (char* input) {
       case '*':
       case 'P':
       case 'p':
+      case '^':
         oper = input[index];
         found = true;
         break;
@@ -84,9 +89,12 @@ bool parseOperator (char* input) {
 void parseInput(char* input, int prec) {
   bigNumber N1, N2, N;
   cleanInput(input);
+  if (input[0] == '?' || input[0] == 'h') {help();  return;}
+  Serial.printf("> %s\n", input);
 
   // Search the first number
   N1.parseNumber(input);
+  N1.displayStruct(); Serial.println();
   Serial.print("  ");
   N1.displayBigNumber(prec);
 
@@ -130,8 +138,7 @@ void parseInput(char* input, int prec) {
         Serial.print("= ");
         N.displayBigNumber(prec);
         break;
-      case 'p':
-      case 'P':
+      case '^':
         N = power(N1, N2);
         Serial.print("= ");
         N.displayBigNumber(prec);
@@ -152,7 +159,7 @@ void parseInput(char* input, int prec) {
 }
 
 // Remove unwanted characters from the string
-// Only keep: 0..9 e E + = * ! < > .
+// Only keep: 0..9 e E ^ p P + = * ! < > .
 void cleanInput(char* input) {
   char output[MAXINPUT];
   int i = 0;
@@ -160,7 +167,7 @@ void cleanInput(char* input) {
   while (input[i] != 0) {
     // List of recognized characters:
     switch (input[i]) {
-      case '0' ... '9':
+      case '0' ... '9': // Guess what...
       case 'e': // Exponent
       case 'E': // Exponent
       case '^': // Exponent
@@ -173,6 +180,8 @@ void cleanInput(char* input) {
       case '*': // Multiplication
       case '!': // Factorial
       case '.': // Decimal dot
+      case 'h': // Display help
+      case '?': // Display help
         output[N++] = input[i];
         break;
       default:

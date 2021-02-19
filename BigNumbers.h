@@ -6,6 +6,9 @@
     where mantissa, expo_0, expo_1 ... expo_n are floating
     point numbers. n is the number of floors of the big number.
 
+    Input 'e' and 'E' as short for '10^' , e.g. 2E4 is 2. 10^4 or 20000
+    and 2eee4 is 2. 10^(10^(10^10^4))
+
     This library enables to apply some of the standard operations
     to the big numbers: addition, multiplication, exponentianation,
     factorial, comparison (< == > !=)
@@ -40,6 +43,7 @@
 #include <Arduino.h>
 // #include "utils.h"
 #define MAXPREC 15 // Maximum number of significant digits (<= 18)
+#define MAXINPUT 60 // MAximum size of input or processing buffer
 
 /*
     For maximum precision, all the values are stored as uint64

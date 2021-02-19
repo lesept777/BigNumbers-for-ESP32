@@ -350,8 +350,8 @@ void bigNumber::parseNumber(char* input) {
 	// find end of number
 	uint16_t maxIndex = 0;
 	while (input[maxIndex] != 0 && ((input[maxIndex] >= '0' && input[maxIndex] <= '9')
-		|| input[maxIndex] == '.' || input[maxIndex] == 'e' || input[maxIndex] == 'E')) 
-		++maxIndex;
+		|| input[maxIndex] == '.' || input[maxIndex] == 'e' || input[maxIndex] == 'E')
+		|| input[maxIndex] == '^') ++maxIndex;
 
 	// count the 'e's
 	uint8_t nE = 0;
@@ -366,7 +366,7 @@ void bigNumber::parseNumber(char* input) {
 	index = 0;
 	int k = 0;
 	uint8_t index0 = 0;
-	char buff[40];
+	char buff[MAXINPUT];
 
 	// remove unwanted characters
 	while ((input[index] < '0' || input[index] > '9') && input[index] != '.') ++index;
